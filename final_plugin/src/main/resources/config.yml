@@ -1,0 +1,34 @@
+# SoundOnly - Configuration
+# Plugin son uniquement : WebSocket + Simple Voice Chat + WorldGuard optionnel.
+
+websocket:
+  # Adresse d'écoute du serveur WebSocket (0.0.0.0 = toutes interfaces)
+  address: "0.0.0.0"
+  # Port WebSocket - doit correspondre à MC_WS_URL dans le panel
+  port: 8765
+
+# Protocole WebSocket :
+#   ping / pong           → keepalive
+#   voice_config          → { enabled, channel_type, distance, zone }
+#   voice_audio           → { codec: "pcm"|"opus", data: base64 }
+#                           PCM : little-endian 16-bit mono 48kHz, 1920 bytes (960 samples) par frame
+#   get_voice_status      → retourne l'état courant
+
+worldguard:
+  # false = tout le monde entend le son
+  # true  = seulement les joueurs dans les régions listées ci-dessous
+  enabled: false
+
+  # Si WorldGuard est absent alors que enabled=true :
+  # true = laisse passer le son | false = bloque le son
+  allow-if-missing: true
+
+  # IDs exacts de tes régions WorldGuard
+  regions:
+    - main_stage
+
+  # Permission pour entendre même hors région
+  bypass-permission: "soundonly.worldguard.bypass"
+
+  # Logs de filtrage joueur
+  debug: false

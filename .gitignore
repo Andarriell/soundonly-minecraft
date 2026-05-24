@@ -1,0 +1,15 @@
+# Node
+panel/node_modules/
+panel/.env
+panel/music/
+panel/playlists.json
+
+# Maven
+final_plugin/target/
+final_plugin/lib/
+
+# Java / divers
+*.class
+*.log
+.DS_Store
+Thumbs.db

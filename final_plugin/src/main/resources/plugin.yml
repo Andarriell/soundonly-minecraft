@@ -1,0 +1,29 @@
+name: SoundOnly
+version: 1.0.0
+main: com.soundonly.SoundOnlyPlugin
+api-version: '1.21'
+description: >
+  Plugin son uniquement : WebSocket PCM/Opus → Simple Voice Chat,
+  avec filtrage optionnel par région WorldGuard.
+
+authors:
+  - AudioViz Team (stripped by Maxime)
+
+softdepend:
+  - voicechat
+  - WorldGuard
+  - WorldEdit
+
+commands:
+  soundonly:
+    description: Commandes SoundOnly
+    usage: /soundonly <status|reload|stop>
+    permission: soundonly.control
+
+permissions:
+  soundonly.control:
+    description: Contrôle le streaming audio
+    default: op
+  soundonly.worldguard.bypass:
+    description: Entend le son même hors région WorldGuard
+    default: op
