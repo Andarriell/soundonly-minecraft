@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Live Sound — TomorrowCraft</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root{
+      --bg:#05050a;
+      --surface:#0d0d18;
+      --text:#e8e8f4;
+      --muted:#5a5a7a;
+      --mono:"Space Mono",monospace;
+      --sans:"Space Grotesk",sans-serif;
+
+      /* Couleurs par zone */
+      --c-main:   #00e5ff;
+      --c-esprit: #bf5fff;
+      --c-vegetal:#39ff6e;
+      --c-futur:  #ff6b35;
+    }
+
+    html,body{height:100%;overflow:hidden}
+
+    body{
+      font-family:var(--sans);
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      overflow:hidden;
+    }
+
+    /* ── Fond animé ── */
+    .bg-grid{
+      position:fixed;inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+      background-size:60px 60px;
+      pointer-events:none;
+      z-index:0;
+    }
+    .bg-glow{
+      position:fixed;
+      width:600px;height:600px;
+      border-radius:50%;
+      filter:blur(120px);
+      opacity:.12;
+      pointer-events:none;
+      z-index:0;
+      transition:background 1.2s ease;
+    }
+    .bg-glow.a{top:-200px;left:-200px;background:var(--active-color,#00e5ff)}
+    .bg-glow.b{bottom:-200px;right:-200px;background:var(--active-color2,#bf5fff)}
+
+    /* ── Layout ── */
+    .page{
+      position:relative;z-index:1;
+      width:100%;max-width:960px;
+      padding:24px 20px;
+      display:flex;flex-direction:column;
+      align-items:center;gap:32px;
+    }
+
+    /* ── Header ── */
+    header{text-align:center}
+    .eyebrow{
+      font-family:var(--mono);
+      font-size:11px;letter-spacing:.2em;
+      color:var(--muted);
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+    h1{
+      font-size:clamp(28px,5vw,48px);
+      font-weight:700;
+      letter-spacing:-.02em;
+      line-height:1;
+    }
+    h1 span{
+      background:linear-gradient(90deg,#00e5ff,#bf5fff);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    /* ── Zone cards ── */
+    .zones{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+      width:100%;
+    }
+    @media(max-width:500px){.zones{grid-template-columns:1fr}}
+
+    .zone-card{
+      position:relative;
+      background:var(--surface);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;
+      padding:20px;
+      cursor:pointer;
+      transition:transform .15s,box-shadow .3s,border-color .3s;
+      overflow:hidden;
+      user-select:none;
+    }
+    .zone-card::before{
+      content:"";
+      position:absolute;inset:0;
+      border-radius:16px;
+      opacity:0;
+      transition:opacity .3s;
+      pointer-events:none;
+    }
+    .zone-card:hover{transform:translateY(-2px)}
+    .zone-card.active{
+      border-color:var(--zcolor);
+      box-shadow:0 0 24px -4px var(--zcolor), inset 0 0 40px rgba(0,0,0,.3);
+    }
+    .zone-card.active::before{
+      background:radial-gradient(ellipse at top left,var(--zcolor)15,transparent 60%);
+      opacity:1;
+    }
+    .zone-card.idle .zone-status-dot{background:var(--muted)}
+
+    .zone-color-bar{
+      position:absolute;top:0;left:0;right:0;
+      height:2px;
+      background:var(--zcolor);
+      opacity:.6;
+      transition:opacity .3s;
+    }
+    .zone-card.active .zone-color-bar{opacity:1;box-shadow:0 0 8px var(--zcolor)}
+
+    .zone-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .zone-status-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--zcolor);
+      flex-shrink:0;
+      transition:box-shadow .3s;
+    }
+    .zone-card.active .zone-status-dot{
+      box-shadow:0 0 8px var(--zcolor);
+      animation:zpulse 1.4s ease infinite;
+    }
+    @keyframes zpulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    .zone-name{
+      font-size:15px;font-weight:700;
+      letter-spacing:.01em;
+      flex:1;
+    }
+    .zone-badge{
+      font-family:var(--mono);
+      font-size:9px;letter-spacing:.1em;
+      padding:3px 8px;border-radius:999px;
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      text-transform:uppercase;
+    }
+    .zone-card.streaming .zone-badge{
+      background:color-mix(in srgb, var(--zcolor) 15%, transparent);
+      color:var(--zcolor);
+    }
+    .zone-track{
+      font-family:var(--mono);
+      font-size:11px;
+      color:var(--muted);
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      margin-top:4px;
+      min-height:16px;
+    }
+    .zone-card.active .zone-track{color:var(--text)}
+
+    /* ── Player principal ── */
+    .player{
+      width:100%;
+      background:var(--surface);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:20px;
+      padding:24px;
+      display:none;
+      flex-direction:column;
+      gap:20px;
+    }
+    .player.visible{display:flex}
+
+    .player-top{
+      display:flex;align-items:center;gap:16px;
+    }
+    .player-zone-color{
+      width:4px;height:48px;border-radius:2px;
+      background:var(--active-color,#00e5ff);
+      flex-shrink:0;
+      box-shadow:0 0 10px var(--active-color,#00e5ff);
+    }
+    .player-info{flex:1;overflow:hidden}
+    .player-zone-name{
+      font-size:18px;font-weight:700;
+      color:var(--active-color,#00e5ff);
+    }
+    .player-track{
+      font-family:var(--mono);font-size:12px;
+      color:var(--muted);margin-top:3px;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .player-status{
+      font-family:var(--mono);font-size:10px;
+      letter-spacing:.1em;text-transform:uppercase;
+      color:var(--muted);margin-top:4px;
+    }
+    .player-status.live{color:var(--active-color,#00e5ff)}
+
+    /* Boutons player */
+    .player-controls{display:flex;align-items:center;gap:14px}
+    .btn-play{
+      width:52px;height:52px;border-radius:50%;
+      border:2px solid var(--active-color,#00e5ff);
+      background:transparent;
+      color:var(--active-color,#00e5ff);
+      font-size:20px;cursor:pointer;
+      display:grid;place-items:center;
+      transition:background .15s,box-shadow .15s;
+      flex-shrink:0;
+    }
+    .btn-play:hover{
+      background:color-mix(in srgb,var(--active-color,#00e5ff) 15%,transparent);
+      box-shadow:0 0 16px var(--active-color,#00e5ff);
+    }
+    .btn-stop{
+      width:36px;height:36px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.1);
+      background:transparent;color:var(--muted);
+      font-size:13px;cursor:pointer;
+      display:grid;place-items:center;
+      transition:border-color .15s,color .15s;
+    }
+    .btn-stop:hover{border-color:rgba(255,255,255,.3);color:var(--text)}
+
+    /* Volume */
+    .volume-row{
+      display:flex;align-items:center;gap:12px;
+    }
+    .vol-icon{font-size:16px;color:var(--muted);flex-shrink:0}
+    input[type=range]{
+      flex:1;
+      -webkit-appearance:none;
+      height:3px;
+      border-radius:2px;
+      outline:none;
+      cursor:pointer;
+      background:linear-gradient(to right, var(--active-color,#00e5ff) var(--pct,70%), rgba(255,255,255,.1) var(--pct,70%));
+    }
+    input[type=range]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:14px;height:14px;border-radius:50%;
+      background:var(--active-color,#00e5ff);
+      box-shadow:0 0 6px var(--active-color,#00e5ff);
+      cursor:pointer;
+    }
+    .vol-val{
+      font-family:var(--mono);font-size:12px;
+      color:var(--muted);width:36px;text-align:right;
+    }
+
+    /* ── Visualiseur ── */
+    #visualizer{
+      width:100%;height:64px;
+      border-radius:8px;
+      display:block;
+    }
+
+    /* ── Footer ── */
+    footer{
+      font-family:var(--mono);font-size:10px;
+      color:var(--muted);letter-spacing:.1em;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Live Audio — TomorrowCraft</div>
+    <h1>Choisis ta <span>scène</span></h1>
+  </header>
+
+  <!-- Zones -->
+  <div class="zones" id="zones-grid">
+    <!-- Généré par JS -->
+  </div>
+
+  <!-- Player -->
+  <div class="player" id="player">
+    <div class="player-top">
+      <div class="player-zone-color" id="player-bar"></div>
+      <div class="player-info">
+        <div class="player-zone-name" id="player-zone-name">—</div>
+        <div class="player-track" id="player-track">—</div>
+        <div class="player-status" id="player-status">En attente…</div>
+      </div>
+      <div class="player-controls">
+        <button class="btn-play" id="btn-play" onclick="togglePlay()">▶</button>
+        <button class="btn-stop" onclick="disconnect()" title="Déconnecter">✕</button>
+      </div>
+    </div>
+
+    <canvas id="visualizer"></canvas>
+
+    <div class="volume-row">
+      <span class="vol-icon">🔈</span>
+      <input type="range" id="volume" min="0" max="100" value="80"
+             oninput="setVolume(this.value)"/>
+      <span class="vol-icon">🔊</span>
+      <span class="vol-val" id="vol-label">80%</span>
+    </div>
+  </div>
+
+  <footer>Son local · indépendant · aucune donnée transmise</footer>
+
+</div>
+
+<script>
+// ── Config zones ──────────────────────────────────────────────────────────────
+const ZONES = [
+  { id: "main_stage", label: "Main Stage", color: "#00e5ff" },
+  { id: "esprit",     label: "Esprit",     color: "#bf5fff" },
+  { id: "vegetal",    label: "Végétal",    color: "#39ff6e" },
+  { id: "futuriste",  label: "Futuriste",  color: "#ff6b35" },
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let activeZone   = null;
+let audioCtx     = null;
+let gainNode     = null;
+let analyserNode = null;
+let audioWs      = null;
+let nextTime     = 0;
+let isPaused     = false;
+let zonesStatus  = {};
+let rafId        = null;
+
+// ── Init grid ─────────────────────────────────────────────────────────────────
+function initGrid() {
+  const grid = document.getElementById("zones-grid");
+  grid.innerHTML = ZONES.map(z => `
+    <div class="zone-card idle" id="card-${z.id}"
+         style="--zcolor:${z.color}"
+         onclick="selectZone('${z.id}')">
+      <div class="zone-color-bar"></div>
+      <div class="zone-header">
+        <div class="zone-status-dot"></div>
+        <span class="zone-name">${z.label}</span>
+        <span class="zone-badge" id="badge-${z.id}">Hors ligne</span>
+      </div>
+      <div class="zone-track" id="track-${z.id}">Aucun son en cours</div>
+    </div>
+  `).join("");
+}
+
+// ── Polling statut ────────────────────────────────────────────────────────────
+async function pollStatus() {
+  try {
+    const r = await fetch("/api/public/status");
+    const d = await r.json();
+    zonesStatus = d.zones || {};
+    updateCards();
+  } catch(_) {}
+}
+
+function updateCards() {
+  for (const z of ZONES) {
+    const s     = zonesStatus[z.id] || {};
+    const card  = document.getElementById("card-" + z.id);
+    const badge = document.getElementById("badge-" + z.id);
+    const track = document.getElementById("track-" + z.id);
+    if (!card) continue;
+
+    const streaming = s.streaming && !s.isPaused;
+
+    card.className = "zone-card" +
+      (s.streaming ? " streaming" : " idle") +
+      (activeZone === z.id ? " active" : "");
+
+    badge.textContent = s.streaming
+      ? (s.isPaused ? "En pause" : "En direct")
+      : "Hors ligne";
+
+    track.textContent = s.currentTrack
+      ? s.currentTrack.replace(/\.[^.]+$/, "")
+      : (s.streaming ? "Flux live" : "Aucun son en cours");
+
+    // Met à jour le track dans le player si c'est la zone active
+    if (activeZone === z.id && s.currentTrack) {
+      document.getElementById("player-track").textContent =
+        s.currentTrack.replace(/\.[^.]+$/, "");
+    }
+  }
+}
+
+// ── Sélection zone ────────────────────────────────────────────────────────────
+function selectZone(zoneId) {
+  if (activeZone === zoneId) return;
+  disconnect();
+  activeZone = zoneId;
+  const z = ZONES.find(x => x.id === zoneId);
+
+  // UI player
+  document.getElementById("player-zone-name").textContent = z.label;
+  document.getElementById("player-track").textContent = zonesStatus[zoneId]?.currentTrack?.replace(/\.[^.]+$/,"") || "—";
+  document.getElementById("player-bar").style.background = z.color;
+  document.getElementById("player-bar").style.boxShadow  = "0 0 10px " + z.color;
+  document.getElementById("btn-play").style.borderColor  = z.color;
+  document.getElementById("btn-play").style.color        = z.color;
+  document.getElementById("volume").style.setProperty("--pct", "80%");
+
+  // Fond animé
+  document.querySelector(".bg-glow.a").style.setProperty("--active-color", z.color);
+  document.querySelector(".bg-glow.b").style.setProperty("--active-color2", z.color);
+  document.documentElement.style.setProperty("--active-color", z.color);
+
+  document.getElementById("player").classList.add("visible");
+  updateCards();
+
+  // Lance l'écoute automatiquement
+  startListen(zoneId);
+}
+
+// ── Audio ─────────────────────────────────────────────────────────────────────
+function ensureAudioCtx() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
+  gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.8;
+  analyserNode = audioCtx.createAnalyser();
+  analyserNode.fftSize = 256;
+  gainNode.connect(analyserNode);
+  analyserNode.connect(audioCtx.destination);
+}
+
+function startListen(zoneId) {
+  ensureAudioCtx();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  nextTime = audioCtx.currentTime + 0.2;
+  isPaused = false;
+
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  audioWs = new WebSocket(`${proto}://${location.host}/listen?zone=${encodeURIComponent(zoneId)}`);
+  audioWs.binaryType = "arraybuffer";
+
+  setStatus("Connexion…");
+
+  audioWs.onopen = () => {
+    setStatus("En écoute", true);
+    document.getElementById("btn-play").textContent = "⏸";
+    startVisualizer();
+  };
+
+  audioWs.onmessage = (event) => {
+    if (isPaused) return;
+    const pcm     = new Int16Array(event.data);
+    const float32 = new Float32Array(pcm.length);
+    for (let i = 0; i < pcm.length; i++) float32[i] = pcm[i] / 32768;
+
+    const buffer = audioCtx.createBuffer(1, float32.length, 48000);
+    buffer.getChannelData(0).set(float32);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    src.connect(gainNode);
+    const now = audioCtx.currentTime;
+    if (nextTime < now) nextTime = now + 0.05;
+    src.start(nextTime);
+    nextTime += buffer.duration;
+  };
+
+  audioWs.onclose  = () => { setStatus("Déconnecté"); document.getElementById("btn-play").textContent = "▶"; stopVisualizer(); };
+  audioWs.onerror  = () => { setStatus("Erreur de connexion"); };
+}
+
+function togglePlay() {
+  if (!activeZone) return;
+  if (!audioWs || audioWs.readyState !== WebSocket.OPEN) {
+    startListen(activeZone);
+    return;
+  }
+  isPaused = !isPaused;
+  document.getElementById("btn-play").textContent = isPaused ? "▶" : "⏸";
+  setStatus(isPaused ? "En pause" : "En écoute", !isPaused);
+}
+
+function disconnect() {
+  if (audioWs) { audioWs.close(); audioWs = null; }
+  if (activeZone) {
+    const card = document.getElementById("card-" + activeZone);
+    if (card) card.classList.remove("active");
+  }
+  activeZone = null;
+  isPaused   = false;
+  document.getElementById("player").classList.remove("visible");
+  stopVisualizer();
+  updateCards();
+}
+
+function setVolume(val) {
+  const v = val / 100;
+  if (gainNode) gainNode.gain.value = v;
+  document.getElementById("vol-label").textContent = val + "%";
+  const input = document.getElementById("volume");
+  input.style.setProperty("--pct", val + "%");
+}
+
+function setStatus(txt, live) {
+  const el = document.getElementById("player-status");
+  el.textContent = txt;
+  el.className = "player-status" + (live ? " live" : "");
+}
+
+// ── Visualiseur canvas ────────────────────────────────────────────────────────
+function startVisualizer() {
+  const canvas = document.getElementById("visualizer");
+  const ctx    = canvas.getContext("2d");
+  const color  = activeZone ? ZONES.find(z => z.id === activeZone)?.color || "#00e5ff" : "#00e5ff";
+
+  function draw() {
+    rafId = requestAnimationFrame(draw);
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!analyserNode) return;
+    const data = new Uint8Array(analyserNode.frequencyBinCount);
+    analyserNode.getByteFrequencyData(data);
+
+    const bars  = Math.min(data.length, 60);
+    const bw    = canvas.width / bars;
+    const maxH  = canvas.height;
+
+    for (let i = 0; i < bars; i++) {
+      const v = data[i] / 255;
+      const h = Math.max(2, v * maxH);
+      const x = i * bw;
+      const alpha = 0.3 + v * 0.7;
+
+      // Gradient bar
+      const grad = ctx.createLinearGradient(0, maxH - h, 0, maxH);
+      grad.addColorStop(0, color);
+      grad.addColorStop(1, color + "44");
+      ctx.fillStyle = grad;
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.roundRect(x + 1, maxH - h, bw - 2, h, 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  draw();
+}
+
+function stopVisualizer() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  const canvas = document.getElementById("visualizer");
+  const ctx    = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+initGrid();
+pollStatus();
+setInterval(pollStatus, 3000);
+</script>
+</body>
+</html>

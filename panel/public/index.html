@@ -1,148 +1,142 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Audio Panel · Minecraft</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:#0c0d0f; --surface:#13151a; --border:#1f2330; --border-hi:#2d3348;
-      --text:#d8dce8; --muted:#6b7494; --accent:#3d7eff; --accent-hi:#6fa0ff;
-      --green:#3dcc7e; --red:#e05252; --yellow:#e0b84a; --radius:10px;
-      --mono:"IBM Plex Mono",monospace; --sans:"IBM Plex Sans",sans-serif;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0c0d0f;--surface:#13151a;--border:#1f2330;--border-hi:#2d3348;
+      --text:#d8dce8;--muted:#6b7494;--accent:#3d7eff;--accent-hi:#6fa0ff;
+      --green:#3dcc7e;--red:#e05252;--yellow:#e0b84a;--purple:#a855f7;
+      --radius:10px;--mono:"IBM Plex Mono",monospace;--sans:"IBM Plex Sans",sans-serif;
     }
-    body { font-family:var(--sans); background:var(--bg); color:var(--text); min-height:100vh; padding:24px 16px 64px; }
-    .page { max-width:920px; margin:0 auto; }
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px 64px}
+    .page{max-width:1100px;margin:0 auto}
 
     /* Header */
-    header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid var(--border); }
-    .logo { display:flex; align-items:center; gap:12px; }
-    .logo-icon { width:38px; height:38px; background:var(--accent); border-radius:8px; display:grid; place-items:center; font-size:18px; }
-    .logo h1 { font-size:17px; font-weight:600; }
-    .logo p  { font-size:12px; color:var(--muted); font-family:var(--mono); margin-top:2px; }
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo-icon{width:38px;height:38px;background:var(--accent);border-radius:8px;display:grid;place-items:center;font-size:18px}
+    .logo h1{font-size:17px;font-weight:600}
+    .logo p{font-size:12px;color:var(--muted);font-family:var(--mono);margin-top:2px}
 
     /* Status pills */
-    .statusbar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
-    .pill { display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:5px 12px; font-size:12px; font-family:var(--mono); color:var(--muted); }
-    .pill b { color:var(--text); font-weight:500; }
-    .dot { width:7px; height:7px; border-radius:50%; background:var(--muted); flex-shrink:0; }
-    .dot.green { background:var(--green); box-shadow:0 0 6px var(--green); }
-    .dot.red   { background:var(--red);   box-shadow:0 0 6px var(--red); }
-    .dot.yellow { background:var(--yellow); animation:pulse 1.2s ease infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .statusbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+    .pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:12px;font-family:var(--mono);color:var(--muted)}
+    .pill b{color:var(--text);font-weight:500}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
+    .dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+    .dot.red{background:var(--red);box-shadow:0 0 6px var(--red)}
+    .dot.yellow{background:var(--yellow);animation:pulse 1.2s ease infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-    /* Tabs */
-    .tabs { display:flex; gap:4px; margin-bottom:18px; border-bottom:1px solid var(--border); }
-    .tab { padding:9px 18px; font-size:13px; font-weight:500; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .15s,border-color .15s; }
-    .tab:hover { color:var(--text); }
-    .tab.active { color:var(--accent-hi); border-bottom-color:var(--accent); }
-    .tab-content { display:none; }
-    .tab-content.active { display:block; }
+    /* Layout zones */
+    .zones-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .zones-header h2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .zones-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:20px}
 
-    /* Grid */
-    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
-    @media(max-width:640px){ .grid-2{ grid-template-columns:1fr; } }
+    /* Zone card */
+    .zone-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .zone-card.streaming{border-color:var(--accent)}
+    .zone-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:#0f111a}
+    .zone-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}
+    .zone-dot.on{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.2s ease infinite}
+    .zone-name{font-size:13px;font-weight:600;font-family:var(--mono);flex:1}
+    .zone-track{font-size:11px;color:var(--muted);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
+    .zone-body{padding:16px}
 
-    /* Card */
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
-    .card-title { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
+    /* Tabs inside zone */
+    .ztabs{display:flex;gap:2px;margin-bottom:14px;background:var(--bg);border-radius:8px;padding:3px}
+    .ztab{flex:1;text-align:center;padding:6px;font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;border-radius:6px;transition:background .15s,color .15s}
+    .ztab.active{background:var(--surface);color:var(--text)}
+    .ztab-content{display:none}
+    .ztab-content.active{display:block}
 
     /* Inputs */
-    input[type=text],input[type=password],input[type=url],select {
-      width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius);
-      color:var(--text); font-family:var(--mono); font-size:13px; padding:9px 12px; outline:none; transition:border-color .15s;
-    }
-    input:focus,select:focus { border-color:var(--accent); }
-    input::placeholder { color:var(--muted); }
-    input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer; margin:10px 0 6px; }
-    input[type=file] { font-size:12px; font-family:var(--sans); color:var(--muted); cursor:pointer; width:100%; }
-    input[type=file]::file-selector-button { font-size:12px; background:var(--border); border:none; color:var(--text); padding:6px 10px; border-radius:6px; cursor:pointer; margin-right:8px; }
-    label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; margin-top:12px; }
-    label:first-child { margin-top:0; }
+    input[type=text],input[type=password],input[type=url],select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 12px;outline:none;transition:border-color .15s}
+    input:focus,select:focus{border-color:var(--accent)}
+    input::placeholder{color:var(--muted)}
+    input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:8px 0 4px}
+    input[type=file]{font-size:12px;font-family:var(--sans);color:var(--muted);cursor:pointer;width:100%}
+    input[type=file]::file-selector-button{font-size:12px;background:var(--border);border:none;color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;margin-right:8px}
+    label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;margin-top:10px}
+    label:first-child{margin-top:0}
 
     /* Buttons */
-    .btn-row { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
-    button { font-family:var(--sans); font-size:13px; font-weight:500; padding:8px 16px; border-radius:var(--radius); border:none; cursor:pointer; transition:opacity .15s,transform .1s; white-space:nowrap; }
-    button:active { transform:scale(.97); }
-    button:disabled { opacity:.4; cursor:not-allowed; }
-    .btn-primary { background:var(--accent); color:#fff; }
-    .btn-primary:hover:not(:disabled) { background:var(--accent-hi); }
-    .btn-ghost   { background:var(--border); color:var(--text); }
-    .btn-ghost:hover:not(:disabled) { background:var(--border-hi); }
-    .btn-danger  { background:#2e1515; color:var(--red); border:1px solid #4a1f1f; }
-    .btn-danger:hover:not(:disabled) { background:#3d1a1a; }
-    .btn-green   { background:#0f2e1e; color:var(--green); border:1px solid #1a4830; }
-    .btn-green:hover:not(:disabled) { background:#122e1e; }
-    .btn-yellow  { background:#2e2610; color:var(--yellow); border:1px solid #4a3c10; }
-    .btn-yellow:hover:not(:disabled) { background:#3a2e10; }
-    .btn-sm      { padding:5px 10px; font-size:12px; }
-    .btn-icon    { padding:6px 10px; font-size:14px; }
+    .btn-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+    button{font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 14px;border-radius:var(--radius);border:none;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
+    button:active{transform:scale(.97)}
+    button:disabled{opacity:.4;cursor:not-allowed}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover:not(:disabled){background:var(--accent-hi)}
+    .btn-ghost{background:var(--border);color:var(--text)}
+    .btn-ghost:hover:not(:disabled){background:var(--border-hi)}
+    .btn-danger{background:#2e1515;color:var(--red);border:1px solid #4a1f1f}
+    .btn-danger:hover:not(:disabled){background:#3d1a1a}
+    .btn-green{background:#0f2e1e;color:var(--green);border:1px solid #1a4830}
+    .btn-green:hover:not(:disabled){background:#122e1e}
+    .btn-yellow{background:#2e2610;color:var(--yellow);border:1px solid #4a3c10}
+    .btn-sm{padding:5px 10px;font-size:11px}
+    .btn-icon{padding:5px 9px;font-size:13px}
 
     /* File list */
-    .file-list { list-style:none; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; max-height:220px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
-    .file-list li { display:flex; align-items:center; gap:8px; padding:9px 12px; font-size:13px; font-family:var(--mono); border-bottom:1px solid var(--border); cursor:pointer; transition:background .1s; }
-    .file-list li:last-child { border-bottom:none; }
-    .file-list li:hover { background:var(--border); }
-    .file-list li.active { background:#18243f; color:var(--accent-hi); }
-    .file-list li .fname { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .file-list li .del { color:var(--muted); font-size:11px; padding:2px 6px; border-radius:4px; }
-    .file-list li .del:hover { color:var(--red); background:#2e1515; }
-    .file-empty { padding:20px; text-align:center; color:var(--muted); font-size:13px; }
+    .file-list{list-style:none;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:160px;overflow-y:auto;scrollbar-width:thin}
+    .file-list li{display:flex;align-items:center;gap:6px;padding:7px 10px;font-size:12px;font-family:var(--mono);border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+    .file-list li:last-child{border-bottom:none}
+    .file-list li:hover{background:var(--border)}
+    .file-list li.active{background:#18243f;color:var(--accent-hi)}
+    .file-list li .fname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .file-empty{padding:16px;text-align:center;color:var(--muted);font-size:12px}
 
-    /* Playlist builder */
-    .pl-list { list-style:none; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; max-height:200px; overflow-y:auto; scrollbar-width:thin; }
-    .pl-list li { display:flex; align-items:center; gap:8px; padding:8px 12px; font-size:12px; font-family:var(--mono); border-bottom:1px solid var(--border); }
-    .pl-list li:last-child { border-bottom:none; }
-    .pl-list li .pl-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .pl-list li .pl-count { color:var(--muted); font-size:11px; }
+    /* Playlist list */
+    .pl-list{list-style:none;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:140px;overflow-y:auto;scrollbar-width:thin}
+    .pl-list li{display:flex;align-items:center;gap:6px;padding:7px 10px;font-size:12px;font-family:var(--mono);border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+    .pl-list li:last-child{border-bottom:none}
+    .pl-list li:hover{background:var(--border)}
+    .pl-list li.active{background:#18243f;color:var(--accent-hi)}
+    .pl-list li .pl-n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .pl-list li .pl-c{color:var(--muted);font-size:10px}
 
-    /* Track list inside playlist editor */
-    .track-list { list-style:none; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; max-height:180px; overflow-y:auto; scrollbar-width:thin; }
-    .track-list li { display:flex; align-items:center; gap:8px; padding:7px 12px; font-size:12px; font-family:var(--mono); border-bottom:1px solid var(--border); }
-    .track-list li:last-child { border-bottom:none; }
-    .track-list li .t-num { color:var(--muted); width:22px; text-align:right; flex-shrink:0; }
-    .track-list li .t-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .track-list li.playing { background:#0f2e1e; color:var(--green); }
+    /* Vol display */
+    .vol-row{display:flex;align-items:center;justify-content:space-between}
+    .vol-val{font-family:var(--mono);font-size:18px;font-weight:500}
 
-    /* Now playing */
-    .now-playing { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:16px; display:flex; align-items:center; gap:14px; }
-    .now-playing .np-icon { font-size:22px; flex-shrink:0; }
-    .now-playing .np-info { flex:1; overflow:hidden; }
-    .now-playing .np-track { font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .now-playing .np-pl { font-size:11px; color:var(--muted); font-family:var(--mono); margin-top:3px; }
-    .now-playing .np-controls { display:flex; gap:6px; }
+    /* Bottom panels */
+    .bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    @media(max-width:640px){.bottom-grid{grid-template-columns:1fr}}
 
-    /* Volume */
-    .vol-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
-    .vol-val { font-family:var(--mono); font-size:22px; font-weight:500; }
+    /* Auth */
+    .auth-row{display:flex;gap:8px;margin-bottom:16px}
+    .auth-row input{flex:1}
+
+    /* Card */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+    .card-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
 
     /* Logs */
-    .log-box { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:12px; font-family:var(--mono); font-size:12px; line-height:1.6; color:#7a8099; max-height:200px; overflow-y:auto; scrollbar-width:thin; white-space:pre-wrap; word-break:break-all; }
-    .log-box .l-ok  { color:var(--green); }
-    .log-box .l-err { color:var(--red); }
-    .log-box .l-ts  { color:#3a3f55; }
-
-    .hint { font-size:12px; color:var(--muted); line-height:1.6; margin-top:8px; }
-
-    /* Auth row */
-    .auth-row { display:flex; gap:8px; margin-bottom:16px; }
-    .auth-row input { flex:1; }
-
-    /* Toast */
-    #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--surface); border:1px solid var(--border-hi); border-radius:999px; padding:10px 20px; font-size:13px; font-family:var(--mono); color:var(--text); transition:transform .25s ease; pointer-events:none; z-index:999; white-space:nowrap; }
-    #toast.show { transform:translateX(-50%) translateY(0); }
-    #toast.err  { border-color:var(--red);   color:var(--red); }
-    #toast.ok   { border-color:var(--green); color:var(--green); }
+    .log-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-family:var(--mono);font-size:11px;line-height:1.6;color:#7a8099;max-height:180px;overflow-y:auto;scrollbar-width:thin;white-space:pre-wrap;word-break:break-all}
+    .log-box .l-ok{color:var(--green)}
+    .log-box .l-err{color:var(--red)}
+    .log-box .l-ts{color:#3a3f55}
 
     /* Modal */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:100; display:none; place-items:center; }
-    .modal-overlay.open { display:grid; }
-    .modal { background:var(--surface); border:1px solid var(--border-hi); border-radius:var(--radius); padding:24px; width:min(560px,95vw); max-height:90vh; overflow-y:auto; }
-    .modal h2 { font-size:15px; font-weight:600; margin-bottom:16px; }
-    .modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;place-items:center}
+    .modal-overlay.open{display:grid}
+    .modal{background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--radius);padding:22px;width:min(480px,95vw);max-height:90vh;overflow-y:auto}
+    .modal h2{font-size:14px;font-weight:600;margin-bottom:14px}
+    .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+
+    /* Toast */
+    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border-hi);border-radius:999px;padding:9px 18px;font-size:12px;font-family:var(--mono);color:var(--text);transition:transform .25s ease;pointer-events:none;z-index:999;white-space:nowrap}
+    #toast.show{transform:translateX(-50%) translateY(0)}
+    #toast.err{border-color:var(--red);color:var(--red)}
+    #toast.ok{border-color:var(--green);color:var(--green)}
+
+    .hint{font-size:11px;color:var(--muted);line-height:1.6;margin-top:6px}
   </style>
 </head>
 <body>
@@ -152,132 +146,60 @@
   <header>
     <div class="logo">
       <div class="logo-icon">🎛</div>
-      <div><h1>Audio Panel</h1><p>Minecraft · WebSocket</p></div>
+      <div><h1>Audio Panel</h1><p>Minecraft · Multi-Zones</p></div>
     </div>
-    <button class="btn-ghost btn-sm" onclick="refreshAll()">↻ Rafraîchir</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost btn-sm" onclick="refreshAll()">↻</button>
+    </div>
   </header>
 
-  <!-- Auth + Status -->
+  <!-- Auth + status -->
   <div class="card" style="margin-bottom:16px">
     <div class="card-title">Authentification</div>
     <div class="auth-row">
-      <input id="password" type="password" placeholder="Mot de passe du panel" />
+      <input id="password" type="password" placeholder="Mot de passe"/>
       <button class="btn-primary" onclick="savePassword()">Connexion</button>
       <button class="btn-ghost" onclick="pingMinecraft()">Tester WS</button>
     </div>
-    <div class="statusbar" id="statusbar">
+    <div class="statusbar">
       <span class="pill"><span class="dot" id="dot-ws"></span>Plugin : <b id="lbl-ws">—</b></span>
-      <span class="pill"><span class="dot" id="dot-stream"></span>Stream : <b id="lbl-stream">—</b></span>
-      <span class="pill">Source : <b id="lbl-name">—</b></span>
-      <span class="pill">Vol : <b id="lbl-vol">—</b></span>
+      <span class="pill">Zones actives : <b id="lbl-zones">—</b></span>
     </div>
   </div>
 
-  <!-- Now playing (visible si playlist active) -->
-  <div class="now-playing" id="now-playing" style="display:none">
-    <div class="np-icon">▶</div>
-    <div class="np-info">
-      <div class="np-track" id="np-track">—</div>
-      <div class="np-pl" id="np-pl">—</div>
-    </div>
-    <div class="np-controls">
-      <button class="btn-ghost btn-icon" onclick="prevTrack()" title="Précédent">⏮</button>
-      <button class="btn-danger btn-icon" onclick="stopAudio()" title="Stop">■</button>
-      <button class="btn-ghost btn-icon" onclick="nextTrack()" title="Suivant">⏭</button>
-    </div>
+  <!-- Zones -->
+  <div class="zones-header">
+    <h2>Zones audio</h2>
+    <button class="btn-primary btn-sm" onclick="openNewZoneModal()">+ Nouvelle zone</button>
+  </div>
+  <div class="zones-grid" id="zones-grid">
+    <div class="file-empty" style="grid-column:1/-1">Chargement…</div>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('files')">Fichiers</div>
-    <div class="tab" onclick="switchTab('playlists')">Playlists</div>
-    <div class="tab" onclick="switchTab('stream')">Flux live</div>
-    <div class="tab" onclick="switchTab('settings')">Paramètres</div>
-  </div>
-
-  <!-- TAB: Fichiers -->
-  <div class="tab-content active" id="tab-files">
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Bibliothèque</div>
-        <label>Uploader un fichier</label>
-        <input id="uploadFile" type="file" accept="audio/*" />
-        <div class="btn-row"><button class="btn-ghost btn-sm" onclick="uploadAudio()">⬆ Uploader</button></div>
-        <label style="margin-top:16px">Fichiers disponibles</label>
-        <ul class="file-list" id="file-list"><li class="file-empty">Aucun fichier.</li></ul>
-        <div class="btn-row">
-          <button class="btn-primary" onclick="playSelected()">▶ Lire</button>
-          <button class="btn-danger"  onclick="stopAudio()">■ Stop</button>
-          <button class="btn-ghost btn-sm" onclick="addToPlaylistModal()" title="Ajouter à une playlist">+ Playlist</button>
+  <!-- Bibliothèque + Playlists -->
+  <div class="bottom-grid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span class="card-title" style="margin-bottom:0">Bibliothèque audio</span>
+        <div style="display:flex;gap:6px">
+          <input id="uploadFile" type="file" accept="audio/*" style="display:none" onchange="uploadAudio()"/>
+          <button class="btn-ghost btn-sm" onclick="document.getElementById('uploadFile').click()">⬆ Upload</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">Volume</div>
-        <div class="vol-row"><span style="font-size:13px;color:var(--muted)">Gain FFmpeg</span><span class="vol-val" id="vol-display">100%</span></div>
-        <input id="volume" type="range" min="0" max="300" value="100" oninput="document.getElementById('vol-display').textContent=this.value+'%'" />
-        <div class="btn-row"><button class="btn-ghost btn-sm" onclick="setVolume()">Appliquer</button></div>
-        <p class="hint">S'applique au prochain lancement.</p>
-      </div>
+      <ul class="file-list" id="file-list"><li class="file-empty">Aucun fichier.</li></ul>
     </div>
-  </div>
 
-  <!-- TAB: Playlists -->
-  <div class="tab-content" id="tab-playlists">
-    <div class="grid-2">
-      <!-- Liste playlists -->
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <span class="card-title" style="margin-bottom:0">Mes playlists</span>
-          <button class="btn-primary btn-sm" onclick="openNewPlaylistModal()">+ Nouvelle</button>
-        </div>
-        <ul class="pl-list" id="pl-list"><li class="file-empty">Aucune playlist.</li></ul>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span class="card-title" style="margin-bottom:0">Playlists</span>
+        <button class="btn-primary btn-sm" onclick="openNewPlaylistModal()">+ Nouvelle</button>
       </div>
-
-      <!-- Éditeur playlist -->
-      <div class="card" id="pl-editor" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <span class="card-title" style="margin-bottom:0" id="pl-editor-title">Playlist</span>
-          <button class="btn-ghost btn-sm" onclick="closePlEditor()">✕</button>
-        </div>
-        <ul class="track-list" id="pl-track-list"><li class="file-empty">Vide.</li></ul>
-        <div class="btn-row" style="margin-top:12px">
-          <button class="btn-green" onclick="playCurrentPl(false)">▶ Lire</button>
-          <button class="btn-yellow" onclick="playCurrentPl(true)">🔀 Shuffle</button>
-          <button class="btn-danger btn-sm" onclick="deleteCurrentPl()">Supprimer</button>
-        </div>
-        <div class="btn-row">
-          <button class="btn-ghost btn-sm" onclick="openAddTrackModal()">+ Ajouter morceaux</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB: Flux live -->
-  <div class="tab-content" id="tab-stream">
-    <div class="card" style="max-width:500px">
-      <div class="card-title">Flux Icecast / OBS</div>
-      <label>URL du flux</label>
-      <input id="streamUrl" type="url" placeholder="http://127.0.0.1:8000/live" />
-      <div class="btn-row">
-        <button class="btn-green" onclick="playUrl()">▶ Lancer le live</button>
-        <button class="btn-danger" onclick="stopAudio()">■ Stop</button>
-      </div>
-      <p class="hint">OBS → Icecast2 → ce panel → Minecraft.</p>
-    </div>
-  </div>
-
-  <!-- TAB: Paramètres -->
-  <div class="tab-content" id="tab-settings">
-    <div class="card" style="max-width:500px">
-      <div class="card-title">Connexion</div>
-      <div class="btn-row">
-        <button class="btn-ghost" onclick="pingMinecraft()">Tester connexion WebSocket</button>
-      </div>
+      <ul class="pl-list" id="pl-list"><li class="file-empty">Aucune playlist.</li></ul>
     </div>
   </div>
 
   <!-- Logs -->
-  <div class="card" style="margin-top:16px">
+  <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <span class="card-title" style="margin-bottom:0">Logs serveur</span>
       <button class="btn-ghost btn-sm" onclick="document.getElementById('logs').textContent='Logs vidés.'">Vider</button>
@@ -285,14 +207,28 @@
     <div class="log-box" id="logs">En attente…</div>
   </div>
 
-</div><!-- .page -->
+</div>
 
-<!-- Modal : nouvelle playlist -->
+<!-- Modal nouvelle zone -->
+<div class="modal-overlay" id="modal-new-zone" onclick="if(event.target===this)closeModal('modal-new-zone')">
+  <div class="modal">
+    <h2>Nouvelle zone audio</h2>
+    <label>Nom de la zone <span style="color:var(--muted)">(doit correspondre à l'ID de région WorldGuard)</span></label>
+    <input id="new-zone-name" type="text" placeholder="main_stage"/>
+    <p class="hint">Exemple : main_stage, chill_room, dancefloor</p>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-new-zone')">Annuler</button>
+      <button class="btn-primary" onclick="createZone()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nouvelle playlist -->
 <div class="modal-overlay" id="modal-new-pl" onclick="if(event.target===this)closeModal('modal-new-pl')">
   <div class="modal">
     <h2>Nouvelle playlist</h2>
     <label>Nom</label>
-    <input id="new-pl-name" type="text" placeholder="Ma playlist" />
+    <input id="new-pl-name" type="text" placeholder="Ma playlist"/>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('modal-new-pl')">Annuler</button>
       <button class="btn-primary" onclick="createPlaylist()">Créer</button>
@@ -300,28 +236,18 @@
   </div>
 </div>
 
-<!-- Modal : ajouter morceaux à une playlist depuis fichiers -->
-<div class="modal-overlay" id="modal-add-track" onclick="if(event.target===this)closeModal('modal-add-track')">
+<!-- Modal éditeur playlist -->
+<div class="modal-overlay" id="modal-pl-editor" onclick="if(event.target===this)closeModal('modal-pl-editor')">
   <div class="modal">
-    <h2 id="modal-add-track-title">Ajouter à une playlist</h2>
-    <label>Fichiers (sélection multiple)</label>
-    <ul class="file-list" id="modal-file-list" style="max-height:260px"></ul>
+    <h2 id="pl-editor-title">Playlist</h2>
+    <label>Morceaux</label>
+    <ul class="file-list" id="pl-editor-tracks" style="max-height:200px"></ul>
+    <label style="margin-top:12px">Ajouter des morceaux</label>
+    <ul class="file-list" id="pl-editor-add" style="max-height:160px"></ul>
     <div class="modal-footer">
-      <button class="btn-ghost" onclick="closeModal('modal-add-track')">Annuler</button>
-      <button class="btn-primary" onclick="confirmAddTracks()">Ajouter</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal : ajouter fichier depuis tab fichiers -->
-<div class="modal-overlay" id="modal-pl-pick" onclick="if(event.target===this)closeModal('modal-pl-pick')">
-  <div class="modal">
-    <h2>Ajouter à une playlist</h2>
-    <label>Choisir la playlist</label>
-    <select id="modal-pl-select"></select>
-    <div class="modal-footer">
-      <button class="btn-ghost" onclick="closeModal('modal-pl-pick')">Annuler</button>
-      <button class="btn-primary" onclick="confirmAddToPlaylist()">Ajouter</button>
+      <button class="btn-danger btn-sm" onclick="deleteCurrentPlaylist()">Supprimer</button>
+      <button class="btn-ghost" onclick="closeModal('modal-pl-editor')">Fermer</button>
+      <button class="btn-primary" onclick="savePlaylistEdits()">Sauvegarder</button>
     </div>
   </div>
 </div>
@@ -329,340 +255,578 @@
 <div id="toast"></div>
 
 <script>
+// Labels zones — défini globalement pour être accessible partout
+window.ZONE_LABELS = {
+  "main_stage": "🎤 Main Stage",
+  "esprit":     "🌀 Esprit",
+  "vegetal":    "🌿 Végétal",
+  "futuriste":  "🚀 Futuriste",
+};
+window.zoneLabel = function(name) {
+  return window.ZONE_LABELS[name] || name;
+};
 // ─── Toast ────────────────────────────────────────────────────────────────────
 let toastTimer;
-function toast(msg, type="ok") {
-  const el = document.getElementById("toast");
-  el.textContent = msg; el.className = "show " + type;
+function toast(msg,type="ok"){
+  const el=document.getElementById("toast");
+  el.textContent=msg;el.className="show "+type;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.className = "", 3000);
-}
-
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll(".tab").forEach((t,i) => {
-    const tabs = ["files","playlists","stream","settings"];
-    t.classList.toggle("active", tabs[i] === name);
-  });
-  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-  document.getElementById("tab-"+name).classList.add("active");
-  if (name === "playlists") refreshPlaylists();
+  toastTimer=setTimeout(()=>el.className="",3000);
 }
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
-function openModal(id) { document.getElementById(id).classList.add("open"); }
-function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+function openModal(id){document.getElementById(id).classList.add("open")}
+function closeModal(id){document.getElementById(id).classList.remove("open")}
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
-const passwordInput = document.getElementById("password");
-passwordInput.value = localStorage.getItem("panelPwd") || "";
-passwordInput.addEventListener("keydown", e => { if (e.key === "Enter") savePassword(); });
+const passwordInput=document.getElementById("password");
+passwordInput.value=localStorage.getItem("panelPwd")||"";
+passwordInput.addEventListener("keydown",e=>{if(e.key==="Enter")savePassword()});
 
-async function savePassword() {
-  const pwd = passwordInput.value.trim();
-  if (!pwd) return toast("Saisis un mot de passe.", "err");
-  try {
-    const res = await fetch("/api/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({password:pwd}) });
-    const data = await res.json();
-    if (!res.ok) return toast(data.error || "Mot de passe incorrect.", "err");
-    localStorage.setItem("panelPwd", pwd);
+async function savePassword(){
+  const pwd=passwordInput.value.trim();
+  if(!pwd)return toast("Saisis un mot de passe.","err");
+  try{
+    const res=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pwd})});
+    const data=await res.json();
+    if(!res.ok)return toast(data.error||"Mot de passe incorrect.","err");
+    localStorage.setItem("panelPwd",pwd);
     toast("Connecté ✓");
     await refreshAll();
     await pingMinecraft();
-  } catch(err) { toast("Erreur : " + err.message, "err"); }
+  }catch(err){toast("Erreur : "+err.message,"err")}
 }
 
-function authHeaders(extra={}) {
-  return { Authorization: "Bearer " + (localStorage.getItem("panelPwd")||""), ...extra };
-}
-async function api(url, opts={}) {
-  const res = await fetch(url, { ...opts, headers: authHeaders(opts.headers||{}) });
-  const data = await res.json().catch(()=>({}));
-  if (!res.ok) throw new Error(data.error || `Erreur ${res.status}`);
+function authHeaders(extra={}){return{Authorization:"Bearer "+(localStorage.getItem("panelPwd")||""),...extra}}
+async function api(url,opts={}){
+  const res=await fetch(url,{...opts,headers:authHeaders(opts.headers||{})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error||`Erreur ${res.status}`);
   return data;
 }
 
 // ─── Status ───────────────────────────────────────────────────────────────────
-function setDot(id, state) { document.getElementById(id).className = "dot " + state; }
+let statusData={};
 
-async function refreshStatus() {
-  try {
-    const d = await api("/api/status");
-    setDot("dot-ws", d.wsConnected ? "green" : "red");
-    document.getElementById("lbl-ws").textContent = d.wsConnected ? "connecté" : "déconnecté";
-    setDot("dot-stream", d.streaming ? "yellow" : "");
-    document.getElementById("lbl-stream").textContent = d.streaming ? "en cours" : "arrêté";
-    document.getElementById("lbl-name").textContent = d.streamName || "aucune";
-    document.getElementById("lbl-vol").textContent = Math.round((d.volume||1)*100)+"%";
-    const v = Math.round((d.volume||1)*100);
-    document.getElementById("volume").value = v;
-    document.getElementById("vol-display").textContent = v+"%";
+let lastZoneKeys = "";
 
-    // Now playing
-    const np = document.getElementById("now-playing");
-    if (d.activePlaylist && d.currentTrack) {
-      np.style.display = "flex";
-      document.getElementById("np-track").textContent = d.currentTrack;
-      document.getElementById("np-pl").textContent = `Playlist : ${d.activePlaylist} — piste ${d.playlistIndex+1}`;
+async function refreshStatus(){
+  try{
+    const d=await api("/api/status");
+    statusData=d;
+
+    // Status bar
+    document.getElementById("dot-ws").className="dot "+(d.wsConnected?"green":"red");
+    document.getElementById("lbl-ws").textContent=d.wsConnected?"connecté":"déconnecté";
+    const streaming=Object.values(d.zones||{}).filter(z=>z.streaming).length;
+    document.getElementById("lbl-zones").textContent=`${Object.keys(d.zones||{}).length} (${streaming} en cours)`;
+
+    // Rendu complet uniquement si la liste des zones change
+    const zoneKeys = Object.keys(d.zones||{}).join(",");
+    if(zoneKeys !== lastZoneKeys){
+      lastZoneKeys = zoneKeys;
+      renderZonesGrid(d.zones||{});
     } else {
-      np.style.display = "none";
+      // Mise à jour légère — ne touche pas aux dropdowns ni aux onglets
+      updateZoneCards(d.zones||{});
     }
 
-    if (d.logs) renderLogs(d.logs);
-  } catch(_) { setDot("dot-ws","red"); document.getElementById("lbl-ws").textContent="erreur"; }
+    if(d.logs)renderLogs(d.logs);
+  }catch(_){
+    document.getElementById("dot-ws").className="dot red";
+    document.getElementById("lbl-ws").textContent="erreur";
+  }
 }
 
-function renderLogs(lines) {
-  const box = document.getElementById("logs");
-  const atBottom = box.scrollHeight - box.scrollTop <= box.clientHeight + 20;
-  box.innerHTML = lines.map(line => {
-    const ts = line.match(/^\[.*?\]/)?.[0]||"";
-    const rest = line.slice(ts.length);
-    let cls = "";
-    if (/erreur|error|ERR/i.test(rest)) cls="l-err";
-    else if (/connecté|OK|✓|terminé/i.test(rest)) cls="l-ok";
+// Met à jour uniquement les parties dynamiques des cartes (dot, track, hint)
+function updateZoneCards(zones){
+  for(const [name, z] of Object.entries(zones)){
+    // Dot streaming
+    const dot = document.querySelector(`#zcard-${CSS.escape(name)} .zone-dot`);
+    if(dot) dot.className = "zone-dot " + (z.streaming ? "on" : "");
+
+    // Bordure carte
+    const card = document.getElementById(`zcard-${CSS.escape(name)}`);
+    if(card) card.className = "zone-card " + (z.streaming ? "streaming" : "");
+
+    // Track en cours dans le header
+    const trackEl = document.querySelector(`#zcard-${CSS.escape(name)} .zone-track`);
+    if(z.streaming && (z.currentTrack || z.streamName)){
+      if(trackEl){
+        trackEl.textContent = "▶ " + (z.currentTrack || z.streamName || "");
+        trackEl.title = z.currentTrack || z.streamName || "";
+      } else {
+        // Crée l'élément s'il n'existe pas
+        const header = document.querySelector(`#zcard-${CSS.escape(name)} .zone-header`);
+        if(header){
+          const btn = header.querySelector("button");
+          const span = document.createElement("span");
+          span.className = "zone-track";
+          span.textContent = "▶ " + (z.currentTrack || z.streamName || "");
+          header.insertBefore(span, btn);
+        }
+      }
+    } else if(trackEl) {
+      trackEl.remove();
+    }
+
+    // Hint playlist
+    const hint = document.querySelector(`#ztab-${CSS.escape(name)}-playlist .hint`);
+    if(hint){
+      if(z.activePlaylist){
+        hint.textContent = `Playlist : ${z.activePlaylist} — piste ${z.playlistIndex+1}${z.isPaused?" (en pause)":""}`;
+      } else {
+        hint.textContent = "";
+      }
+    }
+  }
+}
+
+function renderLogs(lines){
+  const box=document.getElementById("logs");
+  const atBottom=box.scrollHeight-box.scrollTop<=box.clientHeight+20;
+  box.innerHTML=lines.map(line=>{
+    const ts=line.match(/^\[.*?\]/)?.[0]||"";
+    const rest=line.slice(ts.length);
+    let cls="";
+    if(/erreur|error|ERR/i.test(rest))cls="l-err";
+    else if(/connecté|OK|✓|terminé/i.test(rest))cls="l-ok";
     return `<span class="l-ts">${ts}</span><span class="${cls}">${rest}</span>`;
   }).join("\n")||"Aucun log.";
-  if (atBottom) box.scrollTop = box.scrollHeight;
+  if(atBottom)box.scrollTop=box.scrollHeight;
+}
+
+// ─── Zones Grid ───────────────────────────────────────────────────────────────
+let zoneFiles={};       // zone → fichier sélectionné
+let zonePlaylists={};   // zone → playlist sélectionnée
+
+function renderZonesGrid(zones){
+  const grid=document.getElementById("zones-grid");
+  const allPlaylists=playlists; // global
+
+  if(!Object.keys(zones).length){
+    grid.innerHTML='<div class="file-empty" style="grid-column:1/-1">Aucune zone. Crée-en une !</div>';
+    return;
+  }
+
+  grid.innerHTML=Object.entries(zones).map(([name,z])=>`
+    <div class="zone-card ${z.streaming?'streaming':''}" id="zcard-${CSS.escape(name)}">
+      <div class="zone-header">
+        <div class="zone-dot ${z.streaming?'on':''}"></div>
+        <span class="zone-name">${{"main_stage":"🎤 Main Stage","esprit":"🌀 Esprit","vegetal":"🌿 Végétal","futuriste":"🚀 Futuriste"}[name]||name}</span>
+        ${z.streaming?`<span class="zone-track" title="${z.currentTrack||z.streamName||''}">▶ ${z.currentTrack||z.streamName||''}</span>`:''}
+        <button class="btn-danger btn-sm" style="margin-left:auto" onclick="deleteZone('${name}')" title="Supprimer la zone">✕</button>
+      </div>
+      <div class="zone-body">
+        <!-- Sub-tabs -->
+        <div class="ztabs" id="ztabs-${name}">
+          <div class="ztab active" onclick="switchZtab('${name}','fichier')">Fichier</div>
+          <div class="ztab" onclick="switchZtab('${name}','playlist')">Playlist</div>
+          <div class="ztab" onclick="switchZtab('${name}','live')">Live</div>
+          <div class="ztab" onclick="switchZtab('${name}','volume')">Vol</div>
+        </div>
+
+        <!-- Fichier -->
+        <div class="ztab-content active" id="ztab-${name}-fichier">
+          <select id="zfile-${name}" onchange="zoneFiles['${name}']=this.value" style="margin-bottom:8px">
+            <option value="">— Choisir un fichier —</option>
+            ${allFiles.map(f=>`<option value="${escape(f)}" ${zoneFiles[name]===f?'selected':''}>${f}</option>`).join('')}
+          </select>
+          <div class="btn-row">
+            <button class="btn-green" onclick="playZoneFile('${name}')">▶ Lire</button>
+            <button class="btn-ghost btn-icon" onclick="zonePause('${name}')" title="Pause">⏸</button>
+            <button class="btn-ghost btn-icon" onclick="zoneResume('${name}')" title="Reprendre">▶</button>
+            <button class="btn-danger" onclick="stopZone('${name}')">■ Stop</button>
+          </div>
+          <div class="btn-row" style="margin-top:6px">
+            <button class="btn-ghost btn-sm" id="btn-listen-${name}" onclick="toggleListen('${name}')">🎧 Écouter</button>
+            <span id="listen-status-${name}" style="font-size:11px;color:var(--muted);margin-left:6px"></span>
+          </div>
+        </div>
+
+        <!-- Playlist -->
+        <div class="ztab-content" id="ztab-${name}-playlist">
+          <select id="zpl-${name}" style="margin-bottom:8px">
+            <option value="">— Choisir une playlist —</option>
+            ${Object.keys(allPlaylists).map(p=>`<option value="${escape(p)}">${p}</option>`).join('')}
+          </select>
+          <div class="btn-row">
+            <button class="btn-green" onclick="playZonePlaylist('${name}')">▶ Lire</button>
+            <button class="btn-ghost btn-icon" onclick="zonePause('${name}')" title="Pause">⏸</button>
+            <button class="btn-ghost btn-icon" onclick="zoneResume('${name}')" title="Reprendre">▶</button>
+            <button class="btn-ghost btn-icon" onclick="zonePrev('${name}')" title="Précédent">⏮</button>
+            <button class="btn-ghost btn-icon" onclick="zoneNext('${name}')" title="Suivant">⏭</button>
+            <button class="btn-danger" onclick="stopZone('${name}')">■</button>
+          </div>
+          ${z.activePlaylist?`<p class="hint">Playlist : ${z.activePlaylist} — piste ${z.playlistIndex+1}${z.isPaused?' (en pause)':''}</p>`:''}
+        </div>
+
+        <!-- Live -->
+        <div class="ztab-content" id="ztab-${name}-live">
+          <input type="url" id="zlive-${name}" placeholder="http://127.0.0.1:8000/live" style="margin-bottom:8px"/>
+          <div class="btn-row">
+            <button class="btn-green" onclick="playZoneLive('${name}')">▶ Lancer</button>
+            <button class="btn-danger" onclick="stopZone('${name}')">■ Stop</button>
+          </div>
+          <p class="hint">OBS → Icecast2 → Minecraft</p>
+        </div>
+
+        <!-- Volume -->
+        <div class="ztab-content" id="ztab-${name}-volume">
+          <div class="vol-row" style="margin-bottom:4px">
+            <span style="font-size:12px;color:var(--muted)">Gain FFmpeg</span>
+            <span class="vol-val" id="zvol-display-${name}">100%</span>
+          </div>
+          <input type="range" min="0" max="300" value="100" id="zvol-${name}"
+            oninput="document.getElementById('zvol-display-${name}').textContent=this.value+'%'"/>
+          <div class="btn-row">
+            <button class="btn-ghost btn-sm" onclick="setZoneVolume('${name}')">Appliquer</button>
+          </div>
+          <p class="hint">S'applique au prochain lancement.</p>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function switchZtab(zone,tab){
+  document.querySelectorAll(`#ztabs-${CSS.escape(zone)} .ztab`).forEach((t,i)=>{
+    const tabs=['fichier','playlist','live','volume'];
+    t.classList.toggle('active',tabs[i]===tab);
+  });
+  ['fichier','playlist','live','volume'].forEach(t=>{
+    const el=document.getElementById(`ztab-${zone}-${t}`);
+    if(el)el.classList.toggle('active',t===tab);
+  });
+}
+
+// ─── Zone actions ─────────────────────────────────────────────────────────────
+function openNewZoneModal(){
+  document.getElementById("new-zone-name").value="";
+  openModal("modal-new-zone");
+}
+
+async function createZone(){
+  const name=document.getElementById("new-zone-name").value.trim();
+  if(!name)return toast("Nom requis.","err");
+  try{
+    await api("/api/zones",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name})});
+    toast(`Zone "${name}" créée.`);closeModal("modal-new-zone");await refreshAll();
+  }catch(err){toast(err.message,"err")}
+}
+
+async function deleteZone(name){
+  if(!confirm(`Supprimer la zone "${name}" ?`))return;
+  try{
+    await api(`/api/zones/${encodeURIComponent(name)}`,{method:"DELETE"});
+    toast(`Zone "${name}" supprimée.`);await refreshAll();
+  }catch(err){toast(err.message,"err")}
+}
+
+async function playZoneFile(zone){
+  const sel=document.getElementById(`zfile-${zone}`);
+  const file=sel?unescape(sel.value):"";
+  if(!file)return toast("Sélectionne un fichier.","err");
+  try{
+    await api(`/api/zones/${encodeURIComponent(zone)}/play`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({file})});
+    toast(`[${zone}] Lecture : ${file}`);await refreshStatus();
+  }catch(err){toast(err.message,"err")}
+}
+
+async function playZonePlaylist(zone){
+  const sel=document.getElementById(`zpl-${zone}`);
+  const pl=sel?unescape(sel.value):"";
+  if(!pl)return toast("Sélectionne une playlist.","err");
+  try{
+    await api(`/api/zones/${encodeURIComponent(zone)}/playlist/play`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({playlist:pl})});
+    toast(`[${zone}] Playlist : ${pl}`);await refreshStatus();
+  }catch(err){toast(err.message,"err")}
+}
+
+async function zonePause(zone){
+  try{await api(`/api/zones/${encodeURIComponent(zone)}/pause`,{method:"POST"});toast(`[${zone}] ⏸ Pause`);await refreshStatus();}
+  catch(err){toast(err.message,"err")}
+}
+
+async function zoneResume(zone){
+  try{await api(`/api/zones/${encodeURIComponent(zone)}/resume`,{method:"POST"});toast(`[${zone}] ▶ Reprise`);await refreshStatus();}
+  catch(err){toast(err.message,"err")}
+}
+
+async function playZoneLive(zone){
+  const url=document.getElementById(`zlive-${zone}`)?.value?.trim();
+  if(!url)return toast("Saisis une URL.","err");
+  try{
+    await api(`/api/zones/${encodeURIComponent(zone)}/stream-url`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
+    toast(`[${zone}] Flux lancé ✓`);await refreshStatus();
+  }catch(err){toast(err.message,"err")}
+}
+
+async function stopZone(zone){
+  try{
+    await api(`/api/zones/${encodeURIComponent(zone)}/stop`,{method:"POST"});
+    toast(`[${zone}] Arrêté.`);await refreshStatus();
+  }catch(err){toast(err.message,"err")}
+}
+
+async function setZoneVolume(zone){
+  const v=Number(document.getElementById(`zvol-${zone}`)?.value||100)/100;
+  try{
+    await api(`/api/zones/${encodeURIComponent(zone)}/volume`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({volume:v})});
+    toast(`[${zone}] Volume → ${Math.round(v*100)}%`);
+  }catch(err){toast(err.message,"err")}
+}
+
+async function zoneNext(zone){
+  try{await api(`/api/zones/${encodeURIComponent(zone)}/playlist/next`,{method:"POST"});await refreshStatus();}
+  catch(err){toast(err.message,"err")}
+}
+async function zonePrev(zone){
+  try{await api(`/api/zones/${encodeURIComponent(zone)}/playlist/prev`,{method:"POST"});await refreshStatus();}
+  catch(err){toast(err.message,"err")}
+}
+
+// Met à jour uniquement les dropdowns fichiers et playlists dans chaque carte
+function updateZoneSelects(){
+  for(const name of (lastZoneKeys ? lastZoneKeys.split(",") : [])){
+    // Dropdown fichiers
+    const fsel = document.getElementById(`zfile-${name}`);
+    if(fsel){
+      const curVal = fsel.value;
+      fsel.innerHTML = '<option value="">— Choisir un fichier —</option>' +
+        allFiles.map(f=>`<option value="${escape(f)}" ${curVal===escape(f)?'selected':''}>${f}</option>`).join('');
+    }
+    // Dropdown playlists
+    const psel = document.getElementById(`zpl-${name}`);
+    if(psel){
+      const curVal = psel.value;
+      psel.innerHTML = '<option value="">— Choisir une playlist —</option>' +
+        Object.keys(playlists).map(p=>`<option value="${escape(p)}" ${curVal===escape(p)?'selected':''}>${p}</option>`).join('');
+    }
+  }
 }
 
 // ─── Fichiers ─────────────────────────────────────────────────────────────────
-let selectedFile = null;
-let allFiles = [];
+let allFiles=[];
 
-async function refreshMusic() {
-  try {
-    const d = await api("/api/music");
-    allFiles = d.files || [];
-    const ul = document.getElementById("file-list");
-    if (!allFiles.length) { ul.innerHTML='<li class="file-empty">Aucun fichier.</li>'; selectedFile=null; return; }
-    ul.innerHTML = allFiles.map(f => `
-      <li onclick="selectFile(this,'${escape(f)}')" class="${selectedFile===f?'active':''}">
+async function refreshMusic(){
+  try{
+    const d=await api("/api/music");
+    allFiles=d.files||[];
+    updateZoneSelects();
+    const ul=document.getElementById("file-list");
+    ul.innerHTML=allFiles.map(f=>`
+      <li>
         <span class="fname">${f}</span>
-        <span class="del btn-sm" onclick="event.stopPropagation();deleteFile('${escape(f)}')">✕</span>
-      </li>`).join("");
-  } catch(err) { toast("Erreur liste fichiers : "+err.message,"err"); }
+        <span style="color:var(--muted);font-size:11px;cursor:pointer;padding:2px 6px;border-radius:4px" onclick="deleteFile('${escape(f)}')" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">✕</span>
+      </li>`).join('')||'<li class="file-empty">Aucun fichier.</li>';
+  }catch(err){toast("Erreur fichiers : "+err.message,"err")}
 }
 
-function selectFile(li, file) {
-  selectedFile = unescape(file);
-  document.querySelectorAll(".file-list li").forEach(el=>el.classList.remove("active"));
-  li.classList.add("active");
+async function deleteFile(file){
+  file=unescape(file);
+  if(!confirm(`Supprimer "${file}" ?`))return;
+  try{await api(`/api/music/${encodeURIComponent(file)}`,{method:"DELETE"});toast(`Supprimé.`);await refreshMusic();}
+  catch(err){toast(err.message,"err")}
 }
 
-async function deleteFile(file) {
-  file = unescape(file);
-  if (!confirm(`Supprimer "${file}" ?`)) return;
-  try {
-    await api(`/api/music/${encodeURIComponent(file)}`, {method:"DELETE"});
-    toast(`Supprimé : ${file}`);
-    if (selectedFile===file) selectedFile=null;
-    await refreshMusic();
-  } catch(err) { toast(err.message,"err"); }
-}
-
-async function uploadAudio() {
-  const file = document.getElementById("uploadFile").files[0];
-  if (!file) return toast("Choisis un fichier audio.","err");
-  const form = new FormData(); form.append("file",file);
-  try {
+async function uploadAudio(){
+  const file=document.getElementById("uploadFile").files[0];
+  if(!file)return;
+  const form=new FormData();form.append("file",file);
+  try{
     await fetch("/api/upload",{method:"POST",headers:authHeaders(),body:form})
       .then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);});
-    toast("Upload terminé ✓"); await refreshMusic();
-  } catch(err) { toast(err.message,"err"); }
-}
-
-// ─── Playback ─────────────────────────────────────────────────────────────────
-async function playSelected() {
-  if (!selectedFile) return toast("Sélectionne un fichier.","err");
-  try {
-    await api("/api/play",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({file:selectedFile})});
-    toast("Lecture : "+selectedFile); await refreshStatus();
-  } catch(err) { toast(err.message,"err"); }
-}
-
-async function playUrl() {
-  const url = document.getElementById("streamUrl").value.trim();
-  if (!url) return toast("Saisis une URL.","err");
-  try {
-    await api("/api/stream-url",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
-    toast("Flux lancé ✓"); await refreshStatus();
-  } catch(err) { toast(err.message,"err"); }
-}
-
-async function stopAudio() {
-  try { await api("/api/stop",{method:"POST"}); toast("Stream arrêté."); await refreshStatus(); }
-  catch(err) { toast(err.message,"err"); }
-}
-
-async function setVolume() {
-  const v = Number(document.getElementById("volume").value)/100;
-  try { await api("/api/volume",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({volume:v})}); toast(`Volume → ${Math.round(v*100)}%`); }
-  catch(err) { toast(err.message,"err"); }
-}
-
-async function pingMinecraft() {
-  try { await api("/api/test-minecraft",{method:"POST"}); toast("Plugin Minecraft joignable ✓"); await refreshStatus(); }
-  catch(err) { toast("Non joignable : "+err.message,"err"); }
+    toast("Upload terminé ✓");await refreshMusic();
+  }catch(err){toast(err.message,"err")}
 }
 
 // ─── Playlists ────────────────────────────────────────────────────────────────
-let playlists = {};
-let currentPl = null; // nom de la playlist en cours d'édition
+let playlists={};
+let editingPl=null;
 
-async function refreshPlaylists() {
-  try {
-    const d = await api("/api/playlists");
-    playlists = d.playlists || {};
-    renderPlList();
-    if (currentPl) renderPlEditor(currentPl);
-  } catch(err) { toast("Erreur playlists : "+err.message,"err"); }
+async function refreshPlaylists(){
+  try{
+    const d=await api("/api/playlists");
+    playlists=d.playlists||{};
+    updateZoneSelects();
+    const ul=document.getElementById("pl-list");
+    const names=Object.keys(playlists);
+    ul.innerHTML=names.map(n=>`
+      <li onclick="openPlEditor('${escape(n)}')">
+        <span class="pl-n">${n}</span>
+        <span class="pl-c">${playlists[n].tracks.length} morceaux</span>
+      </li>`).join('')||'<li class="file-empty">Aucune playlist.</li>';
+  }catch(err){}
 }
 
-function renderPlList() {
-  const ul = document.getElementById("pl-list");
-  const names = Object.keys(playlists);
-  if (!names.length) { ul.innerHTML='<li class="file-empty">Aucune playlist.</li>'; return; }
-  ul.innerHTML = names.map(n => `
-    <li style="cursor:pointer" onclick="openPlEditor('${escape(n)}')">
-      <span class="pl-name">${n}</span>
-      <span class="pl-count">${playlists[n].tracks.length} morceaux</span>
-    </li>`).join("");
-}
-
-function openPlEditor(name) {
-  name = unescape(name);
-  currentPl = name;
-  document.getElementById("pl-editor").style.display = "block";
-  renderPlEditor(name);
-}
-
-function closePlEditor() {
-  currentPl = null;
-  document.getElementById("pl-editor").style.display = "none";
-}
-
-function renderPlEditor(name) {
-  const pl = playlists[name];
-  if (!pl) return;
-  document.getElementById("pl-editor-title").textContent = name;
-  const ul = document.getElementById("pl-track-list");
-  if (!pl.tracks.length) { ul.innerHTML='<li class="file-empty">Vide.</li>'; return; }
-  ul.innerHTML = pl.tracks.map((t,i) => `
-    <li>
-      <span class="t-num">${i+1}</span>
-      <span class="t-name">${t}</span>
-      <span class="del btn-sm" onclick="removeTrack('${escape(name)}',${i})">✕</span>
-    </li>`).join("");
-}
-
-async function removeTrack(name, index) {
-  name = unescape(name);
-  const pl = playlists[name];
-  if (!pl) return;
-  pl.tracks.splice(index, 1);
-  try {
-    await api("/api/playlists",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,tracks:pl.tracks})});
-    toast("Morceau retiré."); await refreshPlaylists();
-  } catch(err) { toast(err.message,"err"); }
-}
-
-function openNewPlaylistModal() {
-  document.getElementById("new-pl-name").value = "";
+function openNewPlaylistModal(){
+  document.getElementById("new-pl-name").value="";
   openModal("modal-new-pl");
 }
 
-async function createPlaylist() {
-  const name = document.getElementById("new-pl-name").value.trim();
-  if (!name) return toast("Nom requis.","err");
-  try {
+async function createPlaylist(){
+  const name=document.getElementById("new-pl-name").value.trim();
+  if(!name)return toast("Nom requis.","err");
+  try{
     await api("/api/playlists",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,tracks:[]})});
-    toast(`Playlist "${name}" créée.`); closeModal("modal-new-pl");
-    await refreshPlaylists(); openPlEditor(name);
-  } catch(err) { toast(err.message,"err"); }
+    toast(`Playlist "${name}" créée.`);closeModal("modal-new-pl");await refreshPlaylists();openPlEditor(name);
+  }catch(err){toast(err.message,"err")}
 }
 
-async function deleteCurrentPl() {
-  if (!currentPl) return;
-  if (!confirm(`Supprimer la playlist "${currentPl}" ?`)) return;
-  try {
-    await api(`/api/playlists/${encodeURIComponent(currentPl)}`,{method:"DELETE"});
-    toast("Playlist supprimée."); closePlEditor(); await refreshPlaylists();
-  } catch(err) { toast(err.message,"err"); }
+function openPlEditor(name){
+  name=unescape(name);
+  editingPl=name;
+  document.getElementById("pl-editor-title").textContent=`Playlist : ${name}`;
+  renderPlEditor();
+  openModal("modal-pl-editor");
 }
 
-async function playCurrentPl(shuffle) {
-  if (!currentPl) return;
-  try {
-    await api(`/api/playlists/${encodeURIComponent(currentPl)}/play`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({shuffle})});
-    toast(`Lecture : ${currentPl}${shuffle?" (shuffle)":""}`); await refreshStatus();
-    switchTab("files");
-  } catch(err) { toast(err.message,"err"); }
+function renderPlEditor(){
+  if(!editingPl)return;
+  const pl=playlists[editingPl];
+  const tracks=pl?pl.tracks:[];
+
+  // Morceaux actuels
+  document.getElementById("pl-editor-tracks").innerHTML=
+    tracks.map((t,i)=>`<li><span class="fname">${i+1}. ${t}</span><span style="color:var(--muted);cursor:pointer;padding:2px 6px" onclick="removePlTrack(${i})">✕</span></li>`).join('')
+    ||'<li class="file-empty">Vide.</li>';
+
+  // Fichiers à ajouter (non déjà dans la playlist)
+  const remaining=allFiles.filter(f=>!tracks.includes(f));
+  document.getElementById("pl-editor-add").innerHTML=
+    remaining.map(f=>`<li onclick="addPlTrack('${escape(f)}',this)"><span class="fname">+ ${f}</span></li>`).join('')
+    ||'<li class="file-empty">Tous les fichiers sont déjà dans la playlist.</li>';
 }
 
-async function nextTrack() {
-  try { await api("/api/playlists/next",{method:"POST"}); toast("Morceau suivant →"); await refreshStatus(); }
-  catch(err) { toast(err.message,"err"); }
+function addPlTrack(file,li){
+  file=unescape(file);
+  const pl=playlists[editingPl];
+  if(!pl||pl.tracks.includes(file))return;
+  pl.tracks.push(file);
+  renderPlEditor();
 }
 
-async function prevTrack() {
-  try { await api("/api/playlists/prev",{method:"POST"}); toast("← Morceau précédent"); await refreshStatus(); }
-  catch(err) { toast(err.message,"err"); }
+function removePlTrack(index){
+  const pl=playlists[editingPl];
+  if(!pl)return;
+  pl.tracks.splice(index,1);
+  renderPlEditor();
 }
 
-// Ajouter morceaux depuis éditeur playlist
-function openAddTrackModal() {
-  if (!currentPl) return;
-  document.getElementById("modal-add-track-title").textContent = `Ajouter à "${currentPl}"`;
-  const ul = document.getElementById("modal-file-list");
-  const existing = playlists[currentPl]?.tracks || [];
-  ul.innerHTML = allFiles.map(f => `
-    <li onclick="this.classList.toggle('active')">
-      <span class="fname">${f}</span>
-      ${existing.includes(f) ? '<span style="color:var(--muted);font-size:11px">déjà dans la liste</span>' : ''}
-    </li>`).join("") || '<li class="file-empty">Aucun fichier.</li>';
-  openModal("modal-add-track");
+async function savePlaylistEdits(){
+  if(!editingPl)return;
+  const pl=playlists[editingPl];
+  try{
+    await api("/api/playlists",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:editingPl,tracks:pl.tracks})});
+    toast("Playlist sauvegardée ✓");closeModal("modal-pl-editor");await refreshPlaylists();
+  }catch(err){toast(err.message,"err")}
 }
 
-async function confirmAddTracks() {
-  if (!currentPl) return;
-  const selected = [...document.querySelectorAll("#modal-file-list li.active")]
-    .map(li => li.querySelector(".fname").textContent);
-  if (!selected.length) return toast("Aucun fichier sélectionné.","err");
-  const pl = playlists[currentPl];
-  const newTracks = [...pl.tracks, ...selected.filter(f => !pl.tracks.includes(f))];
-  try {
-    await api("/api/playlists",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:currentPl,tracks:newTracks})});
-    toast(`${selected.length} morceau(x) ajouté(s).`); closeModal("modal-add-track"); await refreshPlaylists();
-  } catch(err) { toast(err.message,"err"); }
+async function deleteCurrentPlaylist(){
+  if(!editingPl||!confirm(`Supprimer "${editingPl}" ?`))return;
+  try{
+    await api(`/api/playlists/${encodeURIComponent(editingPl)}`,{method:"DELETE"});
+    toast("Playlist supprimée.");closeModal("modal-pl-editor");editingPl=null;await refreshPlaylists();
+  }catch(err){toast(err.message,"err")}
 }
 
-// Ajouter depuis onglet fichiers
-function addToPlaylistModal() {
-  if (!selectedFile) return toast("Sélectionne un fichier d'abord.","err");
-  const sel = document.getElementById("modal-pl-select");
-  const names = Object.keys(playlists);
-  if (!names.length) return toast("Crée d'abord une playlist.","err");
-  sel.innerHTML = names.map(n=>`<option value="${escape(n)}">${n}</option>`).join("");
-  openModal("modal-pl-pick");
+async function pingMinecraft(){
+  try{await api("/api/test-minecraft",{method:"POST"});toast("Plugin joignable ✓");await refreshStatus();}
+  catch(err){toast("Non joignable : "+err.message,"err")}
 }
 
-async function confirmAddToPlaylist() {
-  const name = unescape(document.getElementById("modal-pl-select").value);
-  const pl = playlists[name];
-  if (!pl) return;
-  if (pl.tracks.includes(selectedFile)) { toast("Déjà dans la playlist.","err"); return; }
-  const newTracks = [...pl.tracks, selectedFile];
-  try {
-    await api("/api/playlists",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,tracks:newTracks})});
-    toast(`"${selectedFile}" ajouté à "${name}".`); closeModal("modal-pl-pick"); await refreshPlaylists();
-  } catch(err) { toast(err.message,"err"); }
+// ─── Browser Audio Player ────────────────────────────────────────────────────
+const audioCtxs  = {};  // zone → AudioContext
+const audioWss   = {};  // zone → WebSocket
+const audioNextT = {};  // zone → next schedule time
+
+function toggleListen(zone) {
+  if (audioWss[zone]) {
+    stopListen(zone);
+  } else {
+    startListen(zone);
+  }
+}
+
+function startListen(zone) {
+  const btn  = document.getElementById(`btn-listen-${zone}`);
+  const stat = document.getElementById(`listen-status-${zone}`);
+
+  // Crée un AudioContext si nécessaire
+  if (!audioCtxs[zone]) {
+    audioCtxs[zone] = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
+  }
+  const ctx = audioCtxs[zone];
+  if (ctx.state === "suspended") ctx.resume();
+  audioNextT[zone] = ctx.currentTime + 0.2; // 200ms de buffer initial
+
+  // Connexion WebSocket au panel
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  const ws = new WebSocket(`${proto}://${location.host}/listen?zone=${encodeURIComponent(zone)}`);
+  ws.binaryType = "arraybuffer";
+  audioWss[zone] = ws;
+
+  if (btn)  btn.textContent  = "🔴 Stop écoute";
+  if (stat) stat.textContent = "Connexion…";
+
+  ws.onopen = () => {
+    if (stat) stat.textContent = "En écoute ✓";
+    if (btn)  btn.style.color = "var(--green)";
+  };
+
+  ws.onmessage = (event) => {
+    const ctx  = audioCtxs[zone];
+    if (!ctx) return;
+
+    // Décode PCM Int16 LE → Float32
+    const pcm     = new Int16Array(event.data);
+    const float32 = new Float32Array(pcm.length);
+    for (let i = 0; i < pcm.length; i++) {
+      float32[i] = pcm[i] / 32768.0;
+    }
+
+    // Crée un AudioBuffer et le programme
+    const buffer = ctx.createBuffer(1, float32.length, 48000);
+    buffer.getChannelData(0).set(float32);
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+
+    // Rattrape le retard si nécessaire
+    const now = ctx.currentTime;
+    if (audioNextT[zone] < now) audioNextT[zone] = now + 0.05;
+    source.start(audioNextT[zone]);
+    audioNextT[zone] += buffer.duration;
+  };
+
+  ws.onclose = () => {
+    if (stat) stat.textContent = "";
+    if (btn)  { btn.textContent = "🎧 Écouter"; btn.style.color = ""; }
+    delete audioWss[zone];
+  };
+
+  ws.onerror = () => {
+    if (stat) stat.textContent = "Erreur WS";
+    stopListen(zone);
+  };
+}
+
+function stopListen(zone) {
+  if (audioWss[zone]) { audioWss[zone].close(); delete audioWss[zone]; }
+  const btn  = document.getElementById(`btn-listen-${zone}`);
+  const stat = document.getElementById(`listen-status-${zone}`);
+  if (btn)  { btn.textContent = "🎧 Écouter"; btn.style.color = ""; }
+  if (stat) stat.textContent = "";
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-async function refreshAll() { await Promise.all([refreshStatus(), refreshMusic()]); }
+async function refreshAll(){
+  await Promise.all([refreshStatus(),refreshMusic(),refreshPlaylists()]);
+}
 refreshAll();
-setInterval(refreshStatus, 4000);
+setInterval(refreshStatus,4000);
 </script>
 </body>
 </html>
