@@ -1,58 +1,33 @@
 package com.soundonly.voice;
 
 import com.soundonly.SoundOnlyPlugin;
-import com.soundonly.worldguard.WorldGuardFilter;
+import com.soundonly.zone.AudioZone;
+import com.soundonly.zone.ZoneManager;
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import de.maxhenkel.voicechat.api.VoicechatApi;
-import de.maxhenkel.voicechat.api.VoicechatConnection;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
-import de.maxhenkel.voicechat.api.audiochannel.StaticAudioChannel;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.PlayerConnectedEvent;
 import de.maxhenkel.voicechat.api.events.PlayerDisconnectedEvent;
 import de.maxhenkel.voicechat.api.events.VoicechatServerStartedEvent;
-import de.maxhenkel.voicechat.api.opus.OpusEncoder;
-import de.maxhenkel.voicechat.api.opus.OpusEncoderMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 public class VoicechatIntegration implements VoicechatPlugin, Listener {
 
     private final SoundOnlyPlugin plugin;
     private final Logger log;
+    private final ZoneManager zoneManager;
 
     private VoicechatServerApi serverApi;
-    private OpusEncoder pcmEncoder;
 
-    // Canal statique par joueur
-    private final Map<UUID, AudioChannel> playerChannels = new ConcurrentHashMap<>();
-
-    // File d'opus frames encodées — partagée, broadcast vers tous
-    private final ConcurrentLinkedQueue<byte[]> opusQueue = new ConcurrentLinkedQueue<>();
-
-    private final AtomicBoolean streaming = new AtomicBoolean(false);
-
-    private ScheduledExecutorService scheduler;
-    private ScheduledFuture<?> tickTask;
-
-    public VoicechatIntegration(SoundOnlyPlugin plugin) {
-        this.plugin = plugin;
-        this.log    = plugin.getLogger();
+    public VoicechatIntegration(SoundOnlyPlugin plugin, ZoneManager zoneManager) {
+        this.plugin      = plugin;
+        this.log         = plugin.getLogger();
+        this.zoneManager = zoneManager;
 
         BukkitVoicechatService service = plugin.getServer()
                 .getServicesManager()
@@ -80,152 +55,92 @@ public class VoicechatIntegration implements VoicechatPlugin, Listener {
     }
 
     private void onServerStarted(VoicechatServerStartedEvent event) {
-        serverApi  = event.getVoicechat();
-        pcmEncoder = serverApi.createEncoder(OpusEncoderMode.AUDIO);
+        serverApi = event.getVoicechat();
+        zoneManager.setServerApi(serverApi);
+        log.info("VoicechatServerApi prête.");
 
-        if (pcmEncoder == null) {
-            log.warning("Impossible de créer l'encodeur PCM.");
-            return;
-        }
-
-        log.info("VoicechatServerApi prête – encodeur AUDIO créé.");
-        startTickTask();
-
-        // Ouvre les canaux pour les joueurs déjà en ligne
+        // Initialise les connexions des joueurs déjà en ligne
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            VoicechatConnection conn = serverApi.getConnectionOf(player.getUniqueId());
-            if (conn != null) createChannel(conn);
+            var conn = serverApi.getConnectionOf(player.getUniqueId());
+            if (conn != null) zoneManager.onPlayerConnected(player.getUniqueId(), conn);
         }
     }
 
     private void onPlayerConnected(PlayerConnectedEvent event) {
-        VoicechatConnection conn = event.getConnection();
+        var conn = event.getConnection();
         if (conn == null) return;
-        Player player = plugin.getServer().getPlayer(conn.getPlayer().getUuid());
-        if (player != null) {
-            log.info("[VoiceChat] Player connected: " + player.getName());
-        }
-        createChannel(conn);
+        zoneManager.onPlayerConnected(conn.getPlayer().getUuid(), conn);
+        log.info("[VC] Joueur connecté : " + conn.getPlayer().getUuid());
     }
 
     private void onPlayerDisconnected(PlayerDisconnectedEvent event) {
-        UUID uuid = event.getPlayerUuid();
+        var uuid = event.getPlayerUuid();
         if (uuid == null) return;
-        playerChannels.remove(uuid);
-        log.info("[VoiceChat] Player disconnected: " + uuid);
+        zoneManager.onPlayerDisconnected(uuid);
+        log.info("[VC] Joueur déconnecté : " + uuid);
     }
 
-    private void createChannel(VoicechatConnection conn) {
-        UUID uuid = conn.getPlayer().getUuid();
-        if (playerChannels.containsKey(uuid)) return;
+    // ── Délégation vers ZoneManager ───────────────────────────────────────────
 
-        try {
-            StaticAudioChannel channel = serverApi.createStaticAudioChannel(
-                    UUID.randomUUID(),
-                    serverApi.fromServerLevel(
-                            plugin.getServer().getPlayer(uuid) != null
-                                    ? plugin.getServer().getPlayer(uuid).getWorld()
-                                    : plugin.getServer().getWorlds().get(0)
-                    ),
-                    conn
-            );
-
-            if (channel == null) {
-                log.warning("[VoiceChat] Failed to create static channel for " + uuid);
-                return;
-            }
-
-            playerChannels.put(uuid, channel);
-            log.info("[VoiceChat] Created static audio channel for " + uuid);
-
-        } catch (Exception e) {
-            log.warning("[VoiceChat] Error creating channel: " + e.getMessage());
+    /**
+     * Diffuse un frame PCM vers une zone spécifique.
+     */
+    public void broadcastPcmToZone(String zoneName, byte[] pcmFrame) {
+        AudioZone zone = zoneManager.getZone(zoneName);
+        if (zone == null) {
+            // Crée la zone à la volée si elle n'existe pas encore
+            zone = zoneManager.getOrCreateZone(zoneName);
         }
+        if (zone != null) zone.pushPcm(pcmFrame);
     }
 
-    // ── Tick task — envoie les frames Opus aux joueurs ───────────────────────
-
-    private void startTickTask() {
-        if (tickTask != null) tickTask.cancel(false);
-        if (scheduler == null || scheduler.isShutdown()) {
-            scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-                Thread t = new Thread(r, "SoundOnly-Audio");
-                t.setDaemon(true);
-                return t;
-            });
-        }
-        // 20ms = 1 frame Voice Chat (960 samples @ 48kHz)
-        tickTask = scheduler.scheduleAtFixedRate(this::tickSendAudio, 0, 20, TimeUnit.MILLISECONDS);
+    /**
+     * Diffuse un frame Opus vers une zone spécifique.
+     */
+    public void broadcastOpusToZone(String zoneName, byte[] opusFrame) {
+        AudioZone zone = zoneManager.getZone(zoneName);
+        if (zone == null) zone = zoneManager.getOrCreateZone(zoneName);
+        if (zone != null) zone.pushOpus(opusFrame);
     }
 
-    private void tickSendAudio() {
-        if (playerChannels.isEmpty() || opusQueue.isEmpty()) return;
-
-        // 1 frame par 20ms — cadence exacte Voice Chat
-        byte[] opusFrame = opusQueue.poll();
-        if (opusFrame == null) return;
-
-        for (Map.Entry<UUID, AudioChannel> entry : playerChannels.entrySet()) {
-            try {
-                AudioChannel channel = entry.getValue();
-                if (channel instanceof StaticAudioChannel sc) {
-                    sc.send(opusFrame);
-                }
-            } catch (Exception e) {
-                log.warning("[VoiceChat] Failed to send audio frame: " + e.getMessage());
-            }
-        }
+    /**
+     * Arrête le streaming d'une zone.
+     */
+    public void stopZone(String zoneName) {
+        AudioZone zone = zoneManager.getZone(zoneName);
+        if (zone != null) zone.stopStreaming();
     }
 
-    // ── Diffusion PCM → encode → queue ───────────────────────────────────────
-
-    public void broadcastPcm(byte[] pcmFrame, WorldGuardFilter filter) {
-        if (serverApi == null || pcmEncoder == null) return;
-        streaming.set(true);
-
-        short[] samples = new short[pcmFrame.length / 2];
-        ByteBuffer.wrap(pcmFrame)
-                .order(ByteOrder.LITTLE_ENDIAN)
-                .asShortBuffer()
-                .get(samples);
-
-        try {
-            byte[] opus = pcmEncoder.encode(samples);
-            if (opus != null) {
-                opusQueue.offer(opus);
-                // Limite la taille de la queue
-                while (opusQueue.size() > 200) opusQueue.poll();
-            }
-        } catch (Exception e) {
-            log.warning("[VoiceChat] PCM encode failed: " + e.getMessage());
-            try { pcmEncoder.resetState(); } catch (Exception ignored) {}
-        }
+    /**
+     * Arrête toutes les zones.
+     */
+    public void stopAllZones() {
+        zoneManager.getZones().values().forEach(AudioZone::stopStreaming);
     }
 
-    public void broadcastOpus(byte[] opusFrame, WorldGuardFilter filter) {
-        if (serverApi == null) return;
-        streaming.set(true);
-        opusQueue.offer(opusFrame);
-        while (opusQueue.size() > 200) opusQueue.poll();
+    /**
+     * Compatibilité avec l'ancien système (zone "global").
+     */
+    public void broadcastPcm(byte[] pcmFrame, com.soundonly.worldguard.WorldGuardFilter filter) {
+        broadcastPcmToZone("global", pcmFrame);
     }
 
-    public void stopStreaming() {
-        streaming.set(false);
-        opusQueue.clear();
-        try { if (pcmEncoder != null) pcmEncoder.resetState(); } catch (Exception ignored) {}
+    public void broadcastOpus(byte[] opusFrame, com.soundonly.worldguard.WorldGuardFilter filter) {
+        broadcastOpusToZone("global", opusFrame);
     }
 
-    public boolean isStreaming() { return streaming.get(); }
+    public void stopStreaming() { stopAllZones(); }
 
-    public void configure(String channelType, int distance, String zone) {
-        log.info("[VoiceChat] Config updated: type=" + channelType + ", distance=" + distance + ", zone=" + zone);
+    public boolean isStreaming() {
+        return zoneManager.getZones().values().stream().anyMatch(AudioZone::isStreaming);
+    }
+
+    public boolean isZoneStreaming(String zoneName) {
+        AudioZone zone = zoneManager.getZone(zoneName);
+        return zone != null && zone.isStreaming();
     }
 
     public void shutdown() {
-        if (tickTask != null) { tickTask.cancel(false); tickTask = null; }
-        if (scheduler != null) { scheduler.shutdownNow(); scheduler = null; }
-        opusQueue.clear();
-        playerChannels.clear();
-        try { if (pcmEncoder != null) pcmEncoder.close(); } catch (Exception ignored) {}
+        zoneManager.shutdown();
     }
 }

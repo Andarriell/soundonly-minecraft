@@ -1,13 +1,10 @@
 name: SoundOnly
-version: 1.0.0
+version: 2.0.0
 main: com.soundonly.SoundOnlyPlugin
 api-version: '1.21'
-description: >
-  Plugin son uniquement : WebSocket PCM/Opus → Simple Voice Chat,
-  avec filtrage optionnel par région WorldGuard.
-
+description: Plugin son multi-zones avec WebSocket et Simple Voice Chat.
 authors:
-  - AudioViz Team (stripped by Maxime)
+  - Maxime
 
 softdepend:
   - voicechat
@@ -17,13 +14,64 @@ softdepend:
 commands:
   soundonly:
     description: Commandes SoundOnly
-    usage: /soundonly <status|reload|stop>
-    permission: soundonly.control
-
+    usage: /soundonly <commande>
+    aliases: [so]
+  
 permissions:
+  # --- Joueurs ---
+  soundonly.zone:
+    description: Voir les zones actives et leurs sons
+    default: true
+  soundonly.link:
+    description: Recevoir le lien d'ecoute
+    default: true
+  soundonly.label:
+    description: Voir les labels des zones
+    default: true
+  soundonly.select:
+    description: Selectionner une zone d'ecoute
+    default: true
+
+  # --- Staff ---
+  soundonly.mute:
+    description: Muter une zone
+    default: op
+  soundonly.unmute:
+    description: Unmuter une zone
+    default: op
+  soundonly.panel:
+    description: Recevoir le lien du panel admin
+    default: op
   soundonly.control:
-    description: Contrôle le streaming audio
+    description: Toutes les commandes admin (stop, reload, status)
     default: op
-  soundonly.worldguard.bypass:
-    description: Entend le son même hors région WorldGuard
+
+  # --- Wildcard ---
+  soundonly.control.*:
+    description: Toutes les permissions SoundOnly (joueur + staff + admin)
     default: op
+    children:
+      soundonly.zone: true
+      soundonly.link: true
+      soundonly.label: true
+      soundonly.select: true
+      soundonly.mute: true
+      soundonly.unmute: true
+      soundonly.panel: true
+      soundonly.control: true
+  soundonly.staff:
+    description: Toutes les permissions staff
+    default: op
+    children:
+      soundonly.mute: true
+      soundonly.unmute: true
+      soundonly.panel: true
+      soundonly.control: true
+  soundonly.player:
+    description: Toutes les permissions joueur
+    default: true
+    children:
+      soundonly.zone: true
+      soundonly.link: true
+      soundonly.label: true
+      soundonly.select: true
